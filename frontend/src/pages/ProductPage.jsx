@@ -2,24 +2,15 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api, formatINR, calcDiscount } from '../lib/api';
 import EMIPlanCard from '../components/EMIPlanCard';
-import styles from './ProductPage.module.css';
 
 function Spinner() {
   return (
-    <div className={styles.spinnerWrap}>
-      <div className={styles.loader}></div>
-      <p>Loading product details...</p>
-    </div>
-  );
-}
-
-function ErrorView({ error, onBack }) {
-  return (
-    <div className={styles.errorWrap}>
-      <div className={styles.errorIcon}>😕</div>
-      <h2 className={styles.errorTitle}>Product not found</h2>
-      <p className={styles.errorMsg}>{error}</p>
-      <button onClick={onBack} className={styles.errorBtn}>← Back to Products</button>
+    <div className="spinner-wrap">
+      <div className="spinner">
+        <div className="spinner-ring" />
+        <span className="spinner-label">1Fi</span>
+      </div>
+      <p className="spinner-text">Loading product...</p>
     </div>
   );
 }
@@ -31,184 +22,191 @@ export default function ProductPage() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedVariant, setSelectedVariant] = useState(null);
-  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [variant, setVariant] = useState(null);
+  const [plan, setPlan] = useState(null);
   const [proceeded, setProceeded] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const [imgErr, setImgErr] = useState(false);
-  const [imgLoading, setImgLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
+    setLoading(true); setError(null);
     api.getProduct(slug)
-      .then((data) => {
+      .then(data => {
         setProduct(data);
-        const def = data.variants[0];
-        setSelectedVariant(def);
-        setSelectedPlan(def.emi_plans.find(p => p.is_popular) || def.emi_plans[0]);
+        const v = data.variants[0];
+        setVariant(v);
+        setPlan(v.emi_plans.find(p => p.is_popular) || v.emi_plans[0]);
+        setLoading(false);
       })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      .catch(err => { setError(err.message); setLoading(false); });
   }, [slug]);
 
-  const handleVariantChange = (v) => {
-    setSelectedVariant(v);
-    setSelectedPlan(v.emi_plans.find(p => p.is_popular) || v.emi_plans[0]);
+  const switchVariant = v => {
+    setVariant(v);
+    setImgLoaded(false); setImgErr(false);
+    setPlan(v.emi_plans.find(p => p.is_popular) || v.emi_plans[0]);
     setProceeded(false);
-    setImgErr(false);
-    setImgLoading(true);
   };
 
   const handleProceed = () => {
-    if (!selectedPlan) return;
     setProceeded(true);
     setTimeout(() => setProceeded(false), 3500);
   };
 
-  if (loading) return <div className="container" style={{padding:'80px 0'}}><Spinner /></div>;
-  if (error)   return <div className="container" style={{padding:'80px 0'}}><ErrorView error={error} onBack={() => navigate('/')} /></div>;
-  if (!product) return null;
+  if (loading) return <div className="container"><Spinner /></div>;
 
-  const v = selectedVariant;
-  const discount = calcDiscount(v.mrp, v.price);
-  const savings   = v.mrp - v.price;
-  const storages  = [...new Set(product.variants.map(x => x.storage))];
-  const sameStorageVariants = product.variants.filter(x => x.storage === v.storage);
+  if (error || !product) return (
+    <div className="container" style={{ padding: '80px 0' }}>
+      <div className="error-box">
+        <div className="error-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <h2 className="error-title">Product not found</h2>
+        <p className="error-msg">{error}</p>
+        <button className="retry-btn" onClick={() => navigate('/')}>← Back to Products</button>
+      </div>
+    </div>
+  );
+
+  if (!variant) return null;
+
+  const discount = calcDiscount(variant.mrp, variant.price);
+  const savings = variant.mrp - variant.price;
+  const storages = [...new Set(product.variants.map(v => v.storage))];
+  const sameStorage = product.variants.filter(v => v.storage === variant.storage);
 
   return (
-    <div className={styles.page}>
+    <div className="prod-page">
       {/* Breadcrumb */}
-      <div className={styles.breadcrumb}>
-        <div className="container">
-          <div className={styles.breadcrumbInner}>
-            <button onClick={() => navigate('/')} className={styles.breadBtn}>Home</button>
-            <span className={styles.breadSep}>›</span>
-            <span className={styles.breadCurrent}>{product.name}</span>
-          </div>
+      <div className="breadcrumb">
+        <div className="container breadcrumb-inner">
+          <button className="bc-btn" onClick={() => navigate('/')}>Home</button>
+          <span className="bc-sep">›</span>
+          <span className="bc-current">{product.name}</span>
         </div>
       </div>
 
       <div className="container">
-        <div className={styles.layout}>
+        <div className="prod-layout">
 
-          {/* ─── LEFT: Image ─── */}
-          <div className={styles.imageSection}>
-            <div className={styles.imageWrap}>
-              {/* New badge */}
-              <div className={styles.newBadge}>NEW</div>
+          {/* ── LEFT: Image ── */}
+          <div className="prod-img-col">
+            <div className="prod-img-box">
+              <div className="prod-new-badge">NEW</div>
+              {discount > 0 && <div className="prod-disc-badge">{discount}% OFF</div>}
 
-              {/* Discount badge */}
-              {discount > 0 && (
-                <div className={styles.discBadge}>{discount}% OFF</div>
+              {/* Skeleton */}
+              {!imgLoaded && !imgErr && <div className="skel prod-img-skel" />}
+
+              {/* Image — object-fit:contain fills box properly */}
+              {!imgErr ? (
+                <img
+                  key={variant.id}
+                  src={variant.image_url}
+                  alt={`${product.name} ${variant.name}`}
+                  className={imgLoaded ? '' : 'img-loading'}
+                  onLoad={() => setImgLoaded(true)}
+                  onError={() => { setImgErr(true); setImgLoaded(true); }}
+                />
+              ) : (
+                <div className="prod-img-fallback">
+                  <div className="prod-img-fallback-icon">{product.brand[0]}</div>
+                  <div className="prod-img-fallback-name">{product.name}</div>
+                  <div className="prod-img-fallback-var">{variant.storage} · {variant.color}</div>
+                </div>
               )}
 
-              {/* Image with loading state */}
-              <div className={styles.imageContainer}>
-                {imgLoading && !imgErr && (
-                  <div className={styles.imgSkeleton}>
-                    <div className={`skeleton ${styles.imgSkeletonInner}`} />
-                  </div>
-                )}
-                {!imgErr ? (
-                  <img
-                    key={v.id}
-                    src={v.image_url}
-                    alt={`${product.name} ${v.name}`}
-                    className={`${styles.productImg} ${imgLoading ? styles.imgHidden : ''}`}
-                    onLoad={() => setImgLoading(false)}
-                    onError={() => { setImgErr(true); setImgLoading(false); }}
-                  />
-                ) : (
-                  <div className={styles.imgFallback}>
-                    <div className={styles.imgFallbackIcon}>{product.brand[0]}</div>
-                    <div className={styles.imgFallbackName}>{product.name}</div>
-                    <div className={styles.imgFallbackVariant}>{v.storage} · {v.color}</div>
-                  </div>
-                )}
-              </div>
-
-              {/* Ambient glow */}
-              <div className={styles.imageGlow} style={{ '--glow-color': v.color_hex || '#ccc' }} />
+              <div className="prod-img-overlay" />
             </div>
 
             {/* Color picker */}
-            {sameStorageVariants.length > 1 && (
-              <div className={styles.colorPicker}>
-                <div className={styles.colorPickerLabel}>
-                  Color: <strong>{v.color}</strong>
-                </div>
-                <div className={styles.swatches}>
-                  {sameStorageVariants.map(sv => (
+            {sameStorage.length > 1 && (
+              <div className="color-picker">
+                <span className="color-label">Color: <strong>{variant.color}</strong></span>
+                <div className="swatches">
+                  {sameStorage.map(sv => (
                     <button
                       key={sv.id}
-                      className={`${styles.swatch} ${sv.id === v.id ? styles.swatchActive : ''}`}
-                      style={{ background: sv.color_hex }}
+                      className={`swatch${sv.id === variant.id ? ' active' : ''}`}
+                      style={{ background: sv.color_hex, border: 'none' }}
                       title={sv.color}
-                      onClick={() => handleVariantChange(sv)}
+                      onClick={() => switchVariant(sv)}
                     />
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Product highlights */}
-            <div className={styles.highlights}>
+            {/* Highlights */}
+            <div className="highlights">
               {[
-                { icon:'🚚', text:'Free Delivery' },
-                { icon:'🔄', text:'2-Day Replacement' },
-                { icon:'✅', text:'1 Year Warranty' },
+                {
+                  label: 'Free Delivery',
+                  icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>,
+                },
+                {
+                  label: '2-Day Replace',
+                  icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" /></svg>,
+                },
+                {
+                  label: '1yr Warranty',
+                  icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>,
+                },
               ].map(h => (
-                <div key={h.text} className={styles.highlight}>
-                  <span>{h.icon}</span>
-                  <span>{h.text}</span>
+                <div key={h.label} className="highlight-item">
+                  <span className="highlight-icon">{h.icon}</span>
+                  <span>{h.label}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* ─── RIGHT: Details ─── */}
-          <div className={styles.details}>
-
-            {/* Brand + name */}
-            <div className={styles.brandRow}>
-              <span className={styles.brandTag}>{product.brand}</span>
-              <span className={styles.categoryTag}>{product.category}</span>
+          {/* ── RIGHT: Details ── */}
+          <div className="prod-details">
+            <div>
+              <div className="prod-brand-row">
+                <span className="prod-brand-tag">{product.brand}</span>
+                <span className="prod-cat">{product.category}</span>
+              </div>
+              <h1 className="prod-name" style={{ marginTop: 10, marginBottom: 6 }}>{product.name}</h1>
+              <div className="prod-variant-label">{variant.storage} · {variant.color}</div>
             </div>
-            <h1 className={styles.productName}>{product.name}</h1>
-            <div className={styles.variantLabel}>{v.storage} · {v.color}</div>
 
             {/* Price */}
-            <div className={styles.pricingCard}>
-              <div className={styles.priceRow}>
-                <span className={styles.price}>{formatINR(v.price)}</span>
-                {v.mrp > v.price && (
-                  <span className={styles.mrp}>{formatINR(v.mrp)}</span>
+            <div className="price-card">
+              <div className="price-row">
+                <span className="price-main">{formatINR(variant.price)}</span>
+                {variant.mrp > variant.price && (
+                  <span className="price-mrp">{formatINR(variant.mrp)}</span>
                 )}
               </div>
-              {discount > 0 && (
-                <div className={styles.savingsRow}>
-                  <span className={styles.savingsBadge}>You save {formatINR(savings)}</span>
-                  <span className={styles.discTag}>{discount}% discount applied</span>
+              {savings > 0 && (
+                <div className="price-save-row">
+                  <span className="price-save-badge">You save {formatINR(savings)}</span>
+                  <span className="price-disc-note">{discount}% off applied</span>
                 </div>
               )}
             </div>
 
-            {/* Storage selector */}
+            {/* Storage */}
             {storages.length > 1 && (
-              <div className={styles.storageGroup}>
-                <div className={styles.groupLabel}>Storage</div>
-                <div className={styles.storageBtns}>
+              <div className="storage-group">
+                <div className="group-label">Storage</div>
+                <div className="storage-btns">
                   {storages.map(s => {
-                    const sv = product.variants.find(x => x.storage === s && x.color === v.color)
-                             || product.variants.find(x => x.storage === s);
+                    const sv = product.variants.find(x => x.storage === s && x.color === variant.color)
+                      || product.variants.find(x => x.storage === s);
                     return (
                       <button
                         key={s}
-                        className={`${styles.storageBtn} ${s === v.storage ? styles.storageBtnActive : ''}`}
-                        onClick={() => handleVariantChange(sv)}
+                        className={`storage-btn${s === variant.storage ? ' active' : ''}`}
+                        onClick={() => switchVariant(sv)}
                       >
                         {s}
-                        {s !== v.storage && sv && (
-                          <span className={styles.storageBtnPrice}>{formatINR(sv.price)}</span>
+                        {s !== variant.storage && sv && (
+                          <span className="storage-btn-price">{formatINR(sv.price)}</span>
                         )}
                       </button>
                     );
@@ -218,67 +216,61 @@ export default function ProductPage() {
             )}
 
             {/* EMI Plans */}
-            <div className={styles.emiSection}>
-              <div className={styles.emiSectionHeader}>
+            <div>
+              <div className="emi-header">
                 <div>
-                  <div className={styles.emiTitle}>EMI Plans</div>
-                  <div className={styles.emiSubtitle}>backed by mutual funds · select your plan</div>
+                  <div className="emi-title">EMI Plans</div>
+                  <div className="emi-sub">backed by mutual funds · pick your plan</div>
                 </div>
-                <div className={styles.emiCount}>
-                  {v.emi_plans.length} options
-                </div>
+                <div className="emi-count">{variant.emi_plans.length} options</div>
               </div>
-
-              <div className={styles.plansList}>
-                {v.emi_plans.map(plan => (
+              <div className="emi-plans-list">
+                {variant.emi_plans.map(p => (
                   <EMIPlanCard
-                    key={plan.id}
-                    plan={plan}
-                    isSelected={selectedPlan?.id === plan.id}
-                    onSelect={setSelectedPlan}
+                    key={p.id}
+                    plan={p}
+                    isSelected={plan?.id === p.id}
+                    onSelect={setPlan}
                   />
                 ))}
               </div>
             </div>
 
             {/* Proceed */}
-            <div className={styles.proceedSection}>
-              {selectedPlan && (
-                <div className={styles.planSummary}>
-                  <div className={styles.planSummaryLeft}>
-                    <div className={styles.planSummaryAmt}>{formatINR(selectedPlan.monthly_amount)}<span>/mo</span></div>
-                    <div className={styles.planSummaryTenure}>× {selectedPlan.tenure_months} months</div>
+            <div className="proceed-section">
+              {plan && (
+                <div className="plan-summary">
+                  <div>
+                    <div className="plan-sum-amt">{formatINR(plan.monthly_amount)}/mo</div>
+                    <div className="plan-sum-tenure">× {plan.tenure_months} months</div>
                   </div>
-                  <div className={styles.planSummaryRight}>
-                    {(parseFloat(selectedPlan.interest_rate) === 0) && (
-                      <span className={styles.planZeroTag}>0% Interest</span>
-                    )}
-                    {parseFloat(selectedPlan.cashback_amount) > 0 && (
-                      <span className={styles.planCashbackTag}>+{formatINR(selectedPlan.cashback_amount)} cashback</span>
+                  <div className="plan-sum-tags">
+                    {parseFloat(plan.interest_rate) === 0 && <span className="tag-zero">0% Interest</span>}
+                    {parseFloat(plan.cashback_amount) > 0 && (
+                      <span className="tag-cashback">+{formatINR(plan.cashback_amount)} cashback</span>
                     )}
                   </div>
                 </div>
               )}
 
               <button
-                className={`${styles.proceedBtn} ${proceeded ? styles.proceedSuccess : ''}`}
+                className={`proceed-btn${proceeded ? ' success' : ''}`}
                 onClick={handleProceed}
-                disabled={!selectedPlan}
+                disabled={!plan}
               >
                 {proceeded ? (
-                  <span className={styles.proceedSuccessContent}>
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                      <circle cx="9" cy="9" r="9" fill="rgba(255,255,255,0.2)"/>
-                      <path d="M5.5 9l2.5 2.5 4-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <div className="proceed-btn-inner">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
                     </svg>
-                    Plan confirmed! Processing...
-                  </span>
+                    Plan Confirmed! Processing...
+                  </div>
                 ) : (
                   'Proceed with Selected Plan →'
                 )}
               </button>
 
-              <p className={styles.disclaimer}>
+              <p className="disclaimer">
                 * No credit card required · Backed by mutual funds · RBI regulated
               </p>
             </div>
