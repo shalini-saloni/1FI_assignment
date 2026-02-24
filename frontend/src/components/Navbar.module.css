@@ -1,0 +1,90 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(180deg, rgba(247, 245, 240, 0.97) 0%, rgba(247, 245, 240, 0.92) 100%);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(226, 221, 214, 0.6);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  gap: 16px;
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.logoMark {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), #0F9B6F);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+  transition: all 0.3s ease;
+}
+
+.logoSub {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+.logo:hover .logoSub {
+  color: var(--text-secondary);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.tagline {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.backBtn {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  padding: 8px 16px;
+  border-radius: 99px;
+  background: linear-gradient(135deg, var(--accent-light), rgba(26, 107, 60, 0.12));
+  border: 1px solid rgba(26, 107, 60, 0.2);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+}
+
+.backBtn:hover {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: white;
+  border-color: var(--accent);
+  box-shadow: 0 6px 20px rgba(26, 107, 60, 0.25);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+  .tagline { display: none; }
+}

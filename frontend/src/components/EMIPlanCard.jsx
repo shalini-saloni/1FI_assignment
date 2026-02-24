@@ -1,22 +1,20 @@
 import { formatINR } from '../lib/api';
-import styles from './EMIPlanCard.css';
+import styles from './EMIPlanCard.module.css';
 
 export default function EMIPlanCard({ plan, isSelected, onSelect }) {
-  const totalAmount = plan.monthly_amount * plan.tenure_months;
-  const isZeroInterest = plan.interest_rate === 0 || plan.interest_rate === '0.00';
+  const isZero = parseFloat(plan.interest_rate) === 0;
+  const total  = plan.monthly_amount * plan.tenure_months;
 
   return (
     <button
       className={`${styles.card} ${isSelected ? styles.selected : ''} ${plan.is_popular ? styles.popular : ''}`}
       onClick={() => onSelect(plan)}
     >
-      {plan.is_popular && (
-        <span className={styles.popularBadge}>Most Popular</span>
-      )}
+      {plan.is_popular && <span className={styles.popularBadge}>⭐ Most Popular</span>}
 
-      <div className={styles.main}>
+      <div className={styles.body}>
         <div className={styles.left}>
-          <div className={styles.emi}>
+          <div className={styles.emiAmount}>
             <span className={styles.amount}>{formatINR(plan.monthly_amount)}</span>
             <span className={styles.per}>/mo</span>
           </div>
@@ -24,34 +22,27 @@ export default function EMIPlanCard({ plan, isSelected, onSelect }) {
         </div>
 
         <div className={styles.right}>
-          {isZeroInterest ? (
-            <span className={styles.zeroInterest}>0% Interest</span>
-          ) : (
-            <span className={styles.interestRate}>{plan.interest_rate}% p.a.</span>
-          )}
+          <span className={isZero ? styles.zeroTag : styles.interestTag}>
+            {isZero ? '0% Interest' : `${plan.interest_rate}% p.a.`}
+          </span>
           {parseFloat(plan.cashback_amount) > 0 && (
-            <span className={styles.cashback}>
-              + {formatINR(plan.cashback_amount)} cashback
-            </span>
+            <span className={styles.cashback}>+{formatINR(plan.cashback_amount)} cashback</span>
           )}
         </div>
       </div>
 
       <div className={styles.footer}>
-        Total: {formatINR(totalAmount)}
-        {!isZeroInterest && (
-          <span className={styles.extra}> (incl. interest)</span>
+        <span>Total: {formatINR(total)}{!isZero ? ' (incl. interest)' : ''}</span>
+        {isSelected && (
+          <span className={styles.checkmark}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="7" fill="currentColor" opacity=".15"/>
+              <path d="M4.5 7l2 2 3-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Selected
+          </span>
         )}
       </div>
-
-      {isSelected && (
-        <div className={styles.selectedIndicator}>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <circle cx="8" cy="8" r="8" fill="currentColor" opacity="0.15"/>
-            <path d="M5 8l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
-      )}
     </button>
   );
 }

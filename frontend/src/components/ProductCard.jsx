@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { formatINR, calcDiscount } from '../lib/api';
-import styles from './ProductCard.css';
+import styles from './ProductCard.module.css';
 
 export default function ProductCard({ product, index }) {
   const discount = calcDiscount(product.mrp, product.price);
