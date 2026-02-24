@@ -170,7 +170,7 @@ export default function ProductPage() {
                 <span className="prod-brand-tag">{product.brand}</span>
                 <span className="prod-cat">{product.category}</span>
               </div>
-              <h1 className="prod-name" style={{ marginTop: 10, marginBottom: 6 }}>{product.name}</h1>
+              <h1 className="prod-name" style={{ marginTop: 10, marginBottom: 4 }}>{product.name}</h1>
               <div className="prod-variant-label">{variant.storage} · {variant.color}</div>
             </div>
 

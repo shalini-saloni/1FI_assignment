@@ -103,7 +103,7 @@ export default function Footer() {
 
       <div className="footer-bottom">
         <div className="container footer-bottom-inner">
-          <span className="footer-copy">© 2026 1Fi Smart EMI · All rights reserved</span>
+          <span className="footer-copy">© 2025 1Fi Smart EMI · All rights reserved</span>
           <span className="footer-built">Built for 1Fi Full Stack Developer Assignment</span>
         </div>
       </div>

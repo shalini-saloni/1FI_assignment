@@ -73,7 +73,7 @@ const products = [
     brand: 'Samsung',
     category: 'Smartphones',
     description: 'Galaxy AI is here. The most capable Galaxy S with Snapdragon 8 Elite, integrated S Pen, and 200MP camera.',
-    image_url: 'https://pngdownload.io/wp-content/uploads/2025/02/Samsung-Galaxy-S25-Ultra-Titanium-Black-Premium-Smartphone.webp',
+    image_url: 'https://images.ctfassets.net/evnrpfa1vdk4/5kDbd7OkOzqS8i7FpnyC5C/f75811fefad3854c2b1defcb6fce1be9/sm-s938_galaxys25ultra_front_titaniumblack_241107.png',
     variants: [
       {
         name: '256GB - Titanium Black',
@@ -82,7 +82,7 @@ const products = [
         color_hex: '#1A1A1A',
         mrp: 130999,
         price: 119999,
-        image_url: 'https://pngdownload.io/wp-content/uploads/2025/02/Samsung-Galaxy-S25-Ultra-Titanium-Black-Premium-Smartphone.webp',
+        image_url: 'https://images.ctfassets.net/evnrpfa1vdk4/5kDbd7OkOzqS8i7FpnyC5C/f75811fefad3854c2b1defcb6fce1be9/sm-s938_galaxys25ultra_front_titaniumblack_241107.png',
         emi_plans: [
           { tenure_months: 3,  monthly_amount: 41333, interest_rate: 0,    cashback_amount: 5000, is_popular: false },
           { tenure_months: 6,  monthly_amount: 20667, interest_rate: 0,    cashback_amount: 5000, is_popular: false },
@@ -100,7 +100,7 @@ const products = [
         color_hex: '#B8C8D8',
         mrp: 130999,
         price: 119999,
-        image_url: 'https://media.flixcar.com/webp/synd-asset/Samsung-290665128-ie-galaxy-s25-s938-sm-s938bzbheub-544816688--Download-Source--zoom.png',
+        image_url: 'https://images.samsung.com/is/image/samsung/p6pim/my/2501/gallery/my-galaxy-s25-s938-sm-s938bzbbxme-544707394',
         emi_plans: [
           { tenure_months: 3,  monthly_amount: 41333, interest_rate: 0,    cashback_amount: 5000, is_popular: false },
           { tenure_months: 6,  monthly_amount: 20667, interest_rate: 0,    cashback_amount: 5000, is_popular: false },
@@ -117,7 +117,7 @@ const products = [
         color_hex: '#F0EDE8',
         mrp: 150999,
         price: 139999,
-        image_url: 'https://media.flixcar.com/webp/synd-asset/Samsung-290668272-ie-galaxy-s25-s938-sm-s938bzsdeub-544816840--Download-Source--zoom.png',
+        image_url: 'https://www.att.com/scmsassets/global/devices/phones/samsung/samsung-galaxy-s25-ultra/carousel/titanium-gray-1.png',
         emi_plans: [
           { tenure_months: 3,  monthly_amount: 48333, interest_rate: 0,    cashback_amount: 3000, is_popular: false },
           { tenure_months: 6,  monthly_amount: 24167, interest_rate: 0,    cashback_amount: 3000, is_popular: false },

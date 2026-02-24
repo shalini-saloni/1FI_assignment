@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -580,7 +581,7 @@ img { display: block; max-width: 100%; }
   font-family: var(--font-d); font-size: clamp(28px, 3.5vw, 44px);
   font-weight: 800; line-height: 1.1; letter-spacing: -0.03em;
 }
-.prod-variant-label { font-size: 14px; color: var(--text3); margin-top: -12px; }
+.prod-variant-label { font-size: 14px; color: var(--text3); margin-top: 6px; margin-bottom: 2px; }
 
 /* Price card */
 .price-card {
@@ -613,7 +614,8 @@ img { display: block; max-width: 100%; }
 }
 .storage-btn:hover { border-color: var(--text); color: var(--text); }
 .storage-btn.active { background: var(--text) !important; color: white !important; border-color: var(--text) !important; }
-.storage-btn-price { font-size: 11px; font-weight: 400; opacity: 0.6; }
+.storage-btn-price { font-size: 11px; font-weight: 400; color: var(--text3); }
+.storage-btn.active .storage-btn-price { color: rgba(255,255,255,0.55) !important; }
 
 /* EMI section */
 .emi-header {
