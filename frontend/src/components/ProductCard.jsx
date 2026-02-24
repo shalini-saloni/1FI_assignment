@@ -26,7 +26,7 @@ export default function ProductCard({ product, index }) {
         <div className={styles.imageInner}>
           {!imgErr ? (
             <img
-              src={product.image_url}
+              src={product.image_url || product.variants?.[0]?.image_url}
               alt={product.name}
               className={styles.image}
               onError={() => setImgErr(true)}

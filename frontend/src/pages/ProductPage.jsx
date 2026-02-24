@@ -7,11 +7,8 @@ import styles from './ProductPage.module.css';
 function Spinner() {
   return (
     <div className={styles.spinnerWrap}>
-      <div className={styles.spinnerOuter}>
-        <div className={styles.spinnerInner} />
-        <div className={styles.spinnerLogo}>1Fi</div>
-      </div>
-      <p className={styles.spinnerText}>Loading product...</p>
+      <div className={styles.loader}></div>
+      <p>Loading product details...</p>
     </div>
   );
 }
