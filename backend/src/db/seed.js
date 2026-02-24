@@ -2,7 +2,7 @@ require('dotenv').config();
 const pool = require('./pool');
 const fs = require('fs');
 const path = require('path');
-
+console.log("SEED FILE STARTED");
 const products = [
   {
     name: 'iPhone 17 Pro',
