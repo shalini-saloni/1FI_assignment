@@ -1,0 +1,351 @@
+.page {
+  padding: 48px 0 80px;
+  min-height: 60vh;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: start;
+}
+
+.imageSection {
+  position: sticky;
+  top: 84px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.imageWrap {
+  position: relative;
+  background: var(--surface-alt);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.imageWrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 80%, rgba(26,107,60,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.image {
+  max-height: 340px;
+  width: 100%;
+  object-fit: contain;
+  animation: fadeIn 0.4s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.imageBadge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--highlight);
+  background: var(--highlight-light);
+  padding: 4px 12px;
+  border-radius: 99px;
+  border: 1px solid rgba(255, 92, 43, 0.2);
+}
+
+.colorOptions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+}
+
+.optionLabel {
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.swatches {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--swatch-color, #ccc);
+  border: 2px solid transparent;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.swatch:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.25);
+}
+
+.swatchActive {
+  border: 2px solid var(--text-primary);
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.3), 0 0 0 4px white;
+  transform: scale(1.1);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.brandBadge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+}
+
+.productName {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.5vw, 40px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-top: -8px;
+}
+
+.variantSub {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: -12px;
+}
+
+.pricingBlock {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.price {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.mrpRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mrp {
+  font-size: 15px;
+  color: var(--text-tertiary);
+  text-decoration: line-through;
+}
+
+.discountBadge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--highlight);
+  background: var(--highlight-light);
+  padding: 2px 10px;
+  border-radius: 99px;
+}
+
+.savings {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.optionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.optionButtons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.optionBtn {
+  padding: 8px 20px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.optionBtn:hover {
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+}
+
+.optionBtnActive {
+  border-color: var(--text-primary) !important;
+  background: var(--text-primary) !important;
+  color: white !important;
+}
+
+.emiSection {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.emiHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.emiTitle {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.emiCount {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  background: var(--surface-alt);
+  padding: 3px 10px;
+  border-radius: 99px;
+}
+
+.plansList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.proceedSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.selectedSummary {
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.zeroTag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.proceedBtn {
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: var(--font-body);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.proceedBtn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+}
+
+.proceedBtn:hover:not(:disabled) {
+  background: var(--accent-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(26, 107, 60, 0.3);
+}
+
+.proceedBtn:active {
+  transform: translateY(0);
+}
+
+.proceedBtnDisabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.proceedBtnSuccess {
+  background: #1A6B3C !important;
+  box-shadow: 0 8px 24px rgba(26, 107, 60, 0.4) !important;
+}
+
+.disclaimer {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .imageSection {
+    position: static;
+  }
+
+  .imageWrap {
+    padding: 32px;
+    aspect-ratio: auto;
+    min-height: 280px;
+  }
+
+  .image { max-height: 260px; }
+}
+
+@media (max-width: 600px) {
+  .page { padding: 24px 0 60px; }
+  .productName { font-size: 26px; }
+  .price { font-size: 28px; }
+}

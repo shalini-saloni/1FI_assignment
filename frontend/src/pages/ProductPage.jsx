@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api, formatINR, calcDiscount } from '../lib/api';
 import EMIPlanCard from '../components/EMIPlanCard';
-import styles from './ProductPage.module.css';
+import styles from './ProductPage.css';
 
 export default function ProductPage() {
   const { slug } = useParams();
