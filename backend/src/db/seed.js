@@ -1,0 +1,240 @@
+require('dotenv').config();
+const pool = require('./pool');
+const fs = require('fs');
+const path = require('path');
+
+const products = [
+  {
+    name: 'iPhone 17 Pro',
+    slug: 'iphone-17-pro',
+    brand: 'Apple',
+    category: 'Smartphones',
+    description: 'The most powerful iPhone ever with A19 Pro chip, ProMotion display, and revolutionary camera system.',
+    image_url: 'https://www.mobileana.com/wp-content/uploads/2025/06/Apple-iPhone-17-Pro-Max-Cosmic-Orange.webp',
+    variants: [
+      {
+        name: '256GB - Black Titanium',
+        storage: '256GB',
+        color: 'Black Titanium',
+        color_hex: '#2D2D2D',
+        mrp: 134900,
+        price: 127400,
+        image_url: 'https://m.media-amazon.com/images/I/618vU2qKXQL.jpg',
+        emi_plans: [
+          { tenure_months: 3,  monthly_amount: 44967, interest_rate: 0,    cashback_amount: 7500, is_popular: false },
+          { tenure_months: 6,  monthly_amount: 22483, interest_rate: 0,    cashback_amount: 7500, is_popular: false },
+          { tenure_months: 12, monthly_amount: 11242, interest_rate: 0,    cashback_amount: 7500, is_popular: true  },
+          { tenure_months: 24, monthly_amount: 5621,  interest_rate: 0,    cashback_amount: 7500, is_popular: false },
+          { tenure_months: 36, monthly_amount: 4297,  interest_rate: 10.5, cashback_amount: 7500, is_popular: false },
+          { tenure_months: 48, monthly_amount: 3385,  interest_rate: 10.5, cashback_amount: 7500, is_popular: false },
+          { tenure_months: 60, monthly_amount: 2842,  interest_rate: 10.5, cashback_amount: 7500, is_popular: false },
+        ],
+      },
+      {
+        name: '256GB - Silver Titanium',
+        storage: '256GB',
+        color: 'Silver Titanium',
+        color_hex: '#e0ddda',
+        mrp: 134900,
+        price: 127400,
+        image_url: 'https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSfISgDTYHYQZZB6hrhBsGSK61zxga1MMTUh7Rwxo13CMZ5go9RJUW2nHA0pRWaU9v0-8HdFAocCkyYcVkSnUl58yPU8k-SENHl7IpqOR-9qSLpgMzXGOBPO7Y',
+        emi_plans: [
+          { tenure_months: 3,  monthly_amount: 44967, interest_rate: 0,    cashback_amount: 7500, is_popular: false },
+          { tenure_months: 6,  monthly_amount: 22483, interest_rate: 0,    cashback_amount: 7500, is_popular: false },
+          { tenure_months: 12, monthly_amount: 11242, interest_rate: 0,    cashback_amount: 7500, is_popular: true  },
+          { tenure_months: 24, monthly_amount: 5621,  interest_rate: 0,    cashback_amount: 7500, is_popular: false },
+          { tenure_months: 36, monthly_amount: 4297,  interest_rate: 10.5, cashback_amount: 7500, is_popular: false },
+          { tenure_months: 48, monthly_amount: 3385,  interest_rate: 10.5, cashback_amount: 7500, is_popular: false },
+          { tenure_months: 60, monthly_amount: 2842,  interest_rate: 10.5, cashback_amount: 7500, is_popular: false },
+        ],
+      },
+      {
+        name: '512GB - Blue Titanium',
+        storage: '512GB',
+        color: 'Blue Titanium',
+        color_hex: '#003366',
+        mrp: 154900,
+        price: 148900,
+        image_url: 'https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSXjrgazz_nnXLd81VHxmMCjdS5Oz7nvIxBn3NwHwqqx2R9M7EtW9QiAgGTocE8IVPqKeyBbqJyt1KMe-795W9lzcB_tYmoalmfIau3prUY0DMERYIY_MkpTA',
+        emi_plans: [
+          { tenure_months: 3,  monthly_amount: 51633, interest_rate: 0,    cashback_amount: 5000, is_popular: false },
+          { tenure_months: 6,  monthly_amount: 25817, interest_rate: 0,    cashback_amount: 5000, is_popular: false },
+          { tenure_months: 12, monthly_amount: 12908, interest_rate: 0,    cashback_amount: 5000, is_popular: true  },
+          { tenure_months: 24, monthly_amount: 6454,  interest_rate: 0,    cashback_amount: 5000, is_popular: false },
+          { tenure_months: 36, monthly_amount: 4930,  interest_rate: 10.5, cashback_amount: 5000, is_popular: false },
+          { tenure_months: 60, monthly_amount: 3250,  interest_rate: 10.5, cashback_amount: 5000, is_popular: false },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Samsung Galaxy S25 Ultra',
+    slug: 'samsung-galaxy-s25-ultra',
+    brand: 'Samsung',
+    category: 'Smartphones',
+    description: 'Galaxy AI is here. The most capable Galaxy S with Snapdragon 8 Elite, integrated S Pen, and 200MP camera.',
+    image_url: 'https://vsprod.vijaysales.com/media/catalog/product/s/a/samsung-galaxy-s25-ultra-jetblack_1__1.jpg?optimize=medium&fit=bounds&height=500&width=500',
+    variants: [
+      {
+        name: '256GB - Titanium Black',
+        storage: '256GB',
+        color: 'Titanium Black',
+        color_hex: '#1A1A1A',
+        mrp: 130999,
+        price: 119999,
+        image_url: 'https://vsprod.vijaysales.com/media/catalog/product/s/a/samsung-galaxy-s24-ultra-titanium-black_1_.jpg?optimize=medium&fit=bounds&height=500&width=500',
+        emi_plans: [
+          { tenure_months: 3,  monthly_amount: 41333, interest_rate: 0,    cashback_amount: 5000, is_popular: false },
+          { tenure_months: 6,  monthly_amount: 20667, interest_rate: 0,    cashback_amount: 5000, is_popular: false },
+          { tenure_months: 12, monthly_amount: 10333, interest_rate: 0,    cashback_amount: 5000, is_popular: true  },
+          { tenure_months: 24, monthly_amount: 5167,  interest_rate: 0,    cashback_amount: 5000, is_popular: false },
+          { tenure_months: 36, monthly_amount: 3950,  interest_rate: 10.5, cashback_amount: 5000, is_popular: false },
+          { tenure_months: 48, monthly_amount: 3122,  interest_rate: 10.5, cashback_amount: 5000, is_popular: false },
+          { tenure_months: 60, monthly_amount: 2615,  interest_rate: 10.5, cashback_amount: 5000, is_popular: false },
+        ],
+      },
+      {
+        name: '256GB - Titanium Silver Blue',
+        storage: '256GB',
+        color: 'Titanium Silver Blue',
+        color_hex: '#B8C8D8',
+        mrp: 130999,
+        price: 119999,
+        image_url: 'https://vsprod.vijaysales.com/media/catalog/product/s/a/samsung-galaxy-s25-ultra-blue_1__1.jpg?optimize=medium&fit=bounds&height=500&width=500',
+        emi_plans: [
+          { tenure_months: 3,  monthly_amount: 41333, interest_rate: 0,    cashback_amount: 5000, is_popular: false },
+          { tenure_months: 6,  monthly_amount: 20667, interest_rate: 0,    cashback_amount: 5000, is_popular: false },
+          { tenure_months: 12, monthly_amount: 10333, interest_rate: 0,    cashback_amount: 5000, is_popular: true  },
+          { tenure_months: 24, monthly_amount: 5167,  interest_rate: 0,    cashback_amount: 5000, is_popular: false },
+          { tenure_months: 36, monthly_amount: 3950,  interest_rate: 10.5, cashback_amount: 5000, is_popular: false },
+          { tenure_months: 60, monthly_amount: 2615,  interest_rate: 10.5, cashback_amount: 5000, is_popular: false },
+        ],
+      },
+      {
+        name: '512GB - Titanium Whitesilver',
+        storage: '512GB',
+        color: 'Titanium Whitesilver',
+        color_hex: '#F0EDE8',
+        mrp: 150999,
+        price: 139999,
+        image_url: 'https://vsprod.vijaysales.com/media/catalog/product/s/a/samsung-galaxy-s24-ultra-titanium-whitesilver_1_.jpg?optimize=medium&fit=bounds&height=500&width=500',
+        emi_plans: [
+          { tenure_months: 3,  monthly_amount: 48333, interest_rate: 0,    cashback_amount: 3000, is_popular: false },
+          { tenure_months: 6,  monthly_amount: 24167, interest_rate: 0,    cashback_amount: 3000, is_popular: false },
+          { tenure_months: 12, monthly_amount: 12083, interest_rate: 0,    cashback_amount: 3000, is_popular: true  },
+          { tenure_months: 24, monthly_amount: 6042,  interest_rate: 0,    cashback_amount: 3000, is_popular: false },
+          { tenure_months: 36, monthly_amount: 4617,  interest_rate: 10.5, cashback_amount: 3000, is_popular: false },
+          { tenure_months: 60, monthly_amount: 3045,  interest_rate: 10.5, cashback_amount: 3000, is_popular: false },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'OnePlus 13s',
+    slug: 'oneplus-13s',
+    brand: 'OnePlus',
+    category: 'Smartphones',
+    description: 'Snapdragon 8 Elite, Hasselblad camera system, 100W SUPERVOOC charging, and a stunning 2K AMOLED display.',
+    image_url: 'https://cdn.jiostore.online/v2/jmd-asp/jdprod/wrkr/products/pictures/item/free/resize-w:450/one-plus/494581934/0/Pb4_yJ7wwF-6ZY4cDKzRny-OnePlus-13s-494581934-i-1-1200Wx1200H.jpeg',
+    variants: [
+      {
+        name: '256GB - Green Silk',
+        storage: '256GB',
+        color: 'Green Silk',
+        color_hex: '#008000c9',
+        mrp: 72999,
+        price: 69999,
+        image_url: 'https://cdn.jiostore.online/v2/jmd-asp/jdprod/wrkr/products/pictures/item/free/resize-w:450/one-plus/494581934/0/Pb4_yJ7wwF-6ZY4cDKzRny-OnePlus-13s-494581934-i-1-1200Wx1200H.jpeg',
+        emi_plans: [
+          { tenure_months: 3,  monthly_amount: 23999, interest_rate: 0,    cashback_amount: 2000, is_popular: false },
+          { tenure_months: 6,  monthly_amount: 12000, interest_rate: 0,    cashback_amount: 2000, is_popular: false },
+          { tenure_months: 12, monthly_amount: 6000,  interest_rate: 0,    cashback_amount: 2000, is_popular: true  },
+          { tenure_months: 18, monthly_amount: 4000,  interest_rate: 0,    cashback_amount: 2000, is_popular: false },
+          { tenure_months: 24, monthly_amount: 3150,  interest_rate: 10.5, cashback_amount: 2000, is_popular: false },
+          { tenure_months: 36, monthly_amount: 2208,  interest_rate: 10.5, cashback_amount: 2000, is_popular: false },
+        ],
+      },
+      {
+        name: '256GB - Black Velvet',
+        storage: '256GB',
+        color: 'Black Velvet',
+        color_hex: '#111111',
+        mrp: 72999,
+        price: 69999,
+        image_url: 'https://cdn.jiostore.online/v2/jmd-asp/jdprod/wrkr/products/pictures/item/free/resize-w:450/one-plus/494581933/0/lCo_Cr0AME-6wiqWuuM-t-OnePlus-13s-494581933-i-1-1200Wx1200H.jpeg',
+        emi_plans: [
+          { tenure_months: 3,  monthly_amount: 23999, interest_rate: 0,    cashback_amount: 2000, is_popular: false },
+          { tenure_months: 6,  monthly_amount: 12000, interest_rate: 0,    cashback_amount: 2000, is_popular: false },
+          { tenure_months: 12, monthly_amount: 6000,  interest_rate: 0,    cashback_amount: 5000, is_popular: true  },
+          { tenure_months: 24, monthly_amount: 3150,  interest_rate: 10.5, cashback_amount: 2000, is_popular: false },
+          { tenure_months: 36, monthly_amount: 2208,  interest_rate: 10.5, cashback_amount: 2000, is_popular: false },
+        ],
+      },
+      {
+        name: '512GB - Pink Satin',
+        storage: '512GB',
+        color: 'Pink Satin',
+        color_hex: '#FFC0CB',
+        mrp: 82999,
+        price: 79999,
+        image_url: 'https://cdn.jiostore.online/v2/jmd-asp/jdprod/wrkr/products/pictures/item/free/resize-w:450/one-plus/494581935/0/YuLJcpnkkv-WPtInSKlYD-OnePlus-13s-494581935-i-1-1200Wx1200H.jpeg',
+        emi_plans: [
+          { tenure_months: 3,  monthly_amount: 27333, interest_rate: 0,    cashback_amount: 1500, is_popular: false },
+          { tenure_months: 6,  monthly_amount: 13667, interest_rate: 0,    cashback_amount: 1500, is_popular: false },
+          { tenure_months: 12, monthly_amount: 6833,  interest_rate: 0,    cashback_amount: 1500, is_popular: true  },
+          { tenure_months: 24, monthly_amount: 3583,  interest_rate: 10.5, cashback_amount: 1500, is_popular: false },
+          { tenure_months: 36, monthly_amount: 2512,  interest_rate: 10.5, cashback_amount: 1500, is_popular: false },
+        ],
+      },
+    ],
+  },
+];
+
+async function seed() {
+  const client = await pool.connect();
+  try {
+    console.log('Starting seed...');
+    
+    const schema = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
+    await client.query(schema);
+    
+    await client.query('TRUNCATE emi_plans, variants, products RESTART IDENTITY CASCADE');
+    
+    for (const product of products) {
+      const { rows: [p] } = await client.query(
+        `INSERT INTO products (name, slug, brand, category, description, image_url)
+         VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+        [product.name, product.slug, product.brand, product.category, product.description, product.image_url]
+      );
+      console.log(`Product: ${product.name} (id=${p.id})`);
+      
+      for (const variant of product.variants) {
+        const { rows: [v] } = await client.query(
+          `INSERT INTO variants (product_id, name, storage, color, color_hex, mrp, price, image_url)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+          [p.id, variant.name, variant.storage, variant.color, variant.color_hex, variant.mrp, variant.price, variant.image_url]
+        );
+        console.log(`Variant: ${variant.name} (id=${v.id})`);
+        
+        for (const plan of variant.emi_plans) {
+          await client.query(
+            `INSERT INTO emi_plans (variant_id, tenure_months, monthly_amount, interest_rate, cashback_amount, is_popular)
+             VALUES ($1, $2, $3, $4, $5, $6)`,
+            [v.id, plan.tenure_months, plan.monthly_amount, plan.interest_rate, plan.cashback_amount, plan.is_popular]
+          );
+        }
+        console.log(`Inserted ${variant.emi_plans.length} EMI plans`);
+      }
+    }
+    
+    console.log('Seed complete!');
+  } catch (err) {
+    console.error('Seed error:', err);
+    throw err;
+  } finally {
+    client.release();
+    await pool.end();
+  }
+}
+
+seed().catch(() => process.exit(1));
