@@ -1,58 +1,55 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import styles from './Navbar.module.css';
 
 export default function Navbar() {
-  const location = useLocation();
-  const isHome = location.pathname === '/';
+  const { pathname } = useLocation();
+  const isHome = pathname === '/';
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll);
+    const onScroll = () => setScrolled(window.scrollY > 30);
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   return (
-    <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`}>
-      <div className={`container ${styles.inner}`}>
-        <Link to="/" className={styles.logo}>
-          <div className={styles.logoIcon}>
-            <span className={styles.logoMark}>1Fi</span>
+    <nav className={`nav${scrolled ? ' scrolled' : ''}`}>
+      <div className="container nav-inner">
+
+        <Link to="/" className="nav-logo">
+          <div className="nav-logo-box">
+            <svg width="28" height="20" viewBox="0 0 28 20" fill="none">
+              <text x="0" y="17" fontFamily="'Syne',sans-serif" fontSize="17" fontWeight="800" fill="white" letterSpacing="-0.5">1Fi</text>
+            </svg>
           </div>
-          <div className={styles.logoText}>
-            <span className={styles.logoName}>Smart EMI</span>
-            <span className={styles.logoTagline}>by mutual funds</span>
+          <div className="nav-logo-text">
+            <span className="nav-logo-name">Smart EMI</span>
+            <span className="nav-logo-sub">backed by mutual funds</span>
           </div>
         </Link>
 
-        <div className={styles.center}>
-          <div className={styles.pill}>
-            <span className={styles.pillDot} />
+        <div className="nav-pill">
+          <div className="nav-pill-inner">
+            <span className="nav-dot" />
             EMI plans backed by mutual funds
           </div>
         </div>
 
-        <div className={styles.right}>
-          {!isHome ? (
-            <Link to="/" className={styles.backBtn}>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M8.5 2.5L4 7l4.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              All Products
-            </Link>
-          ) : (
-            <div className={styles.navActions}>
-              <div className={styles.secureTag}>
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <path d="M6 1L10.5 3v3.5c0 2.5-2.25 4.25-4.5 4.5C1.75 10.75-.5 9 .5 6.5V3L6 1z" fill="currentColor" opacity=".15"/>
-                  <path d="M6 1L10.5 3v3.5c0 2.5-2.25 4.25-4.5 4.5C1.75 10.75-.5 9 .5 6.5V3L6 1z" stroke="currentColor" strokeWidth="1"/>
-                </svg>
-                Secure & Safe
-              </div>
-            </div>
-          )}
-        </div>
+        {!isHome ? (
+          <Link to="/" className="nav-back">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            All Products
+          </Link>
+        ) : (
+          <div className="nav-secure">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            Secure & Safe
+          </div>
+        )}
       </div>
     </nav>
   );
