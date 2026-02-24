@@ -4,6 +4,29 @@ import { api, formatINR, calcDiscount } from '../lib/api';
 import EMIPlanCard from '../components/EMIPlanCard';
 import styles from './ProductPage.module.css';
 
+function Spinner() {
+  return (
+    <div className={styles.spinnerWrap}>
+      <div className={styles.spinnerOuter}>
+        <div className={styles.spinnerInner} />
+        <div className={styles.spinnerLogo}>1Fi</div>
+      </div>
+      <p className={styles.spinnerText}>Loading product...</p>
+    </div>
+  );
+}
+
+function ErrorView({ error, onBack }) {
+  return (
+    <div className={styles.errorWrap}>
+      <div className={styles.errorIcon}>😕</div>
+      <h2 className={styles.errorTitle}>Product not found</h2>
+      <p className={styles.errorMsg}>{error}</p>
+      <button onClick={onBack} className={styles.errorBtn}>← Back to Products</button>
+    </div>
+  );
+}
+
 export default function ProductPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -14,117 +37,182 @@ export default function ProductPage() {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [proceeded, setProceeded] = useState(false);
+  const [imgErr, setImgErr] = useState(false);
+  const [imgLoading, setImgLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     api.getProduct(slug)
       .then((data) => {
         setProduct(data);
-        const defaultVariant = data.variants[0];
-        setSelectedVariant(defaultVariant);
-        const popular = defaultVariant.emi_plans.find((p) => p.is_popular);
-        setSelectedPlan(popular || defaultVariant.emi_plans[0]);
+        const def = data.variants[0];
+        setSelectedVariant(def);
+        setSelectedPlan(def.emi_plans.find(p => p.is_popular) || def.emi_plans[0]);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [slug]);
 
-  const handleVariantChange = (variant) => {
-    setSelectedVariant(variant);
-    const popular = variant.emi_plans.find((p) => p.is_popular);
-    setSelectedPlan(popular || variant.emi_plans[0]);
+  const handleVariantChange = (v) => {
+    setSelectedVariant(v);
+    setSelectedPlan(v.emi_plans.find(p => p.is_popular) || v.emi_plans[0]);
     setProceeded(false);
+    setImgErr(false);
+    setImgLoading(true);
   };
 
   const handleProceed = () => {
     if (!selectedPlan) return;
     setProceeded(true);
-    setTimeout(() => setProceeded(false), 3000);
+    setTimeout(() => setProceeded(false), 3500);
   };
 
-  if (loading) return <LoadingSkeleton />;
-  if (error) return <ErrorView error={error} onBack={() => navigate('/')} />;
+  if (loading) return <div className="container" style={{padding:'80px 0'}}><Spinner /></div>;
+  if (error)   return <div className="container" style={{padding:'80px 0'}}><ErrorView error={error} onBack={() => navigate('/')} /></div>;
   if (!product) return null;
 
-  const discount = calcDiscount(selectedVariant.mrp, selectedVariant.price);
-  const savings = selectedVariant.mrp - selectedVariant.price;
-
-  const storages = [...new Set(product.variants.map((v) => v.storage))];
-  const selectedStorage = selectedVariant.storage;
-  const selectedColor = selectedVariant.color;
-
-  const variantsForStorage = product.variants.filter((v) => v.storage === selectedStorage);
+  const v = selectedVariant;
+  const discount = calcDiscount(v.mrp, v.price);
+  const savings   = v.mrp - v.price;
+  const storages  = [...new Set(product.variants.map(x => x.storage))];
+  const sameStorageVariants = product.variants.filter(x => x.storage === v.storage);
 
   return (
     <div className={styles.page}>
+      {/* Breadcrumb */}
+      <div className={styles.breadcrumb}>
+        <div className="container">
+          <div className={styles.breadcrumbInner}>
+            <button onClick={() => navigate('/')} className={styles.breadBtn}>Home</button>
+            <span className={styles.breadSep}>›</span>
+            <span className={styles.breadCurrent}>{product.name}</span>
+          </div>
+        </div>
+      </div>
+
       <div className="container">
         <div className={styles.layout}>
-          {/* Left: Product image */}
+
+          {/* ─── LEFT: Image ─── */}
           <div className={styles.imageSection}>
             <div className={styles.imageWrap}>
-              <div className={styles.imageBadge}>NEW</div>
-              <img
-                key={selectedVariant.id}
-                src={selectedVariant.image_url}
-                alt={`${product.name} - ${selectedVariant.name}`}
-                className={styles.image}
-                onError={(e) => {
-                  e.target.src = `https://via.placeholder.com/500x500/F0EDE8/9A9590?text=${encodeURIComponent(product.name)}`;
-                }}
-              />
+              {/* New badge */}
+              <div className={styles.newBadge}>NEW</div>
+
+              {/* Discount badge */}
+              {discount > 0 && (
+                <div className={styles.discBadge}>{discount}% OFF</div>
+              )}
+
+              {/* Image with loading state */}
+              <div className={styles.imageContainer}>
+                {imgLoading && !imgErr && (
+                  <div className={styles.imgSkeleton}>
+                    <div className={`skeleton ${styles.imgSkeletonInner}`} />
+                  </div>
+                )}
+                {!imgErr ? (
+                  <img
+                    key={v.id}
+                    src={v.image_url}
+                    alt={`${product.name} ${v.name}`}
+                    className={`${styles.productImg} ${imgLoading ? styles.imgHidden : ''}`}
+                    onLoad={() => setImgLoading(false)}
+                    onError={() => { setImgErr(true); setImgLoading(false); }}
+                  />
+                ) : (
+                  <div className={styles.imgFallback}>
+                    <div className={styles.imgFallbackIcon}>{product.brand[0]}</div>
+                    <div className={styles.imgFallbackName}>{product.name}</div>
+                    <div className={styles.imgFallbackVariant}>{v.storage} · {v.color}</div>
+                  </div>
+                )}
+              </div>
+
+              {/* Ambient glow */}
+              <div className={styles.imageGlow} style={{ '--glow-color': v.color_hex || '#ccc' }} />
             </div>
 
-            {/* Color swatches */}
-            <div className={styles.colorOptions}>
-              <div className={styles.optionLabel}>Color: <strong>{selectedColor}</strong></div>
-              <div className={styles.swatches}>
-                {variantsForStorage.map((v) => (
-                  <button
-                    key={v.id}
-                    className={`${styles.swatch} ${v.id === selectedVariant.id ? styles.swatchActive : ''}`}
-                    style={{ '--swatch-color': v.color_hex }}
-                    onClick={() => handleVariantChange(v)}
-                    title={v.color}
-                  />
-                ))}
+            {/* Color picker */}
+            {sameStorageVariants.length > 1 && (
+              <div className={styles.colorPicker}>
+                <div className={styles.colorPickerLabel}>
+                  Color: <strong>{v.color}</strong>
+                </div>
+                <div className={styles.swatches}>
+                  {sameStorageVariants.map(sv => (
+                    <button
+                      key={sv.id}
+                      className={`${styles.swatch} ${sv.id === v.id ? styles.swatchActive : ''}`}
+                      style={{ background: sv.color_hex }}
+                      title={sv.color}
+                      onClick={() => handleVariantChange(sv)}
+                    />
+                  ))}
+                </div>
               </div>
+            )}
+
+            {/* Product highlights */}
+            <div className={styles.highlights}>
+              {[
+                { icon:'🚚', text:'Free Delivery' },
+                { icon:'🔄', text:'2-Day Replacement' },
+                { icon:'✅', text:'1 Year Warranty' },
+              ].map(h => (
+                <div key={h.text} className={styles.highlight}>
+                  <span>{h.icon}</span>
+                  <span>{h.text}</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Right: Details */}
+          {/* ─── RIGHT: Details ─── */}
           <div className={styles.details}>
-            <div className={styles.brandBadge}>{product.brand}</div>
-            <h1 className={styles.productName}>{product.name}</h1>
-            <div className={styles.variantSub}>{selectedVariant.storage}</div>
 
-            {/* Pricing */}
-            <div className={styles.pricingBlock}>
-              <div className={styles.price}>{formatINR(selectedVariant.price)}</div>
-              <div className={styles.mrpRow}>
-                <span className={styles.mrp}>{formatINR(selectedVariant.mrp)}</span>
-                {discount > 0 && (
-                  <>
-                    <span className={styles.discountBadge}>{discount}% off</span>
-                    <span className={styles.savings}>Save {formatINR(savings)}</span>
-                  </>
+            {/* Brand + name */}
+            <div className={styles.brandRow}>
+              <span className={styles.brandTag}>{product.brand}</span>
+              <span className={styles.categoryTag}>{product.category}</span>
+            </div>
+            <h1 className={styles.productName}>{product.name}</h1>
+            <div className={styles.variantLabel}>{v.storage} · {v.color}</div>
+
+            {/* Price */}
+            <div className={styles.pricingCard}>
+              <div className={styles.priceRow}>
+                <span className={styles.price}>{formatINR(v.price)}</span>
+                {v.mrp > v.price && (
+                  <span className={styles.mrp}>{formatINR(v.mrp)}</span>
                 )}
               </div>
+              {discount > 0 && (
+                <div className={styles.savingsRow}>
+                  <span className={styles.savingsBadge}>You save {formatINR(savings)}</span>
+                  <span className={styles.discTag}>{discount}% discount applied</span>
+                </div>
+              )}
             </div>
 
-            {/* Storage options */}
+            {/* Storage selector */}
             {storages.length > 1 && (
-              <div className={styles.optionGroup}>
-                <div className={styles.optionLabel}>Storage</div>
-                <div className={styles.optionButtons}>
-                  {storages.map((stor) => {
-                    const v = product.variants.find((x) => x.storage === stor && x.color === selectedColor)
-                      || product.variants.find((x) => x.storage === stor);
+              <div className={styles.storageGroup}>
+                <div className={styles.groupLabel}>Storage</div>
+                <div className={styles.storageBtns}>
+                  {storages.map(s => {
+                    const sv = product.variants.find(x => x.storage === s && x.color === v.color)
+                             || product.variants.find(x => x.storage === s);
                     return (
                       <button
-                        key={stor}
-                        className={`${styles.optionBtn} ${stor === selectedStorage ? styles.optionBtnActive : ''}`}
-                        onClick={() => handleVariantChange(v)}
+                        key={s}
+                        className={`${styles.storageBtn} ${s === v.storage ? styles.storageBtnActive : ''}`}
+                        onClick={() => handleVariantChange(sv)}
                       >
-                        {stor}
+                        {s}
+                        {s !== v.storage && sv && (
+                          <span className={styles.storageBtnPrice}>{formatINR(sv.price)}</span>
+                        )}
                       </button>
                     );
                   })}
@@ -134,13 +222,18 @@ export default function ProductPage() {
 
             {/* EMI Plans */}
             <div className={styles.emiSection}>
-              <div className={styles.emiHeader}>
-                <div className={styles.emiTitle}>EMI Plans backed by mutual funds</div>
-                <div className={styles.emiCount}>{selectedVariant.emi_plans.length} options</div>
+              <div className={styles.emiSectionHeader}>
+                <div>
+                  <div className={styles.emiTitle}>EMI Plans</div>
+                  <div className={styles.emiSubtitle}>backed by mutual funds · select your plan</div>
+                </div>
+                <div className={styles.emiCount}>
+                  {v.emi_plans.length} options
+                </div>
               </div>
 
               <div className={styles.plansList}>
-                {selectedVariant.emi_plans.map((plan) => (
+                {v.emi_plans.map(plan => (
                   <EMIPlanCard
                     key={plan.id}
                     plan={plan}
@@ -151,66 +244,50 @@ export default function ProductPage() {
               </div>
             </div>
 
-            {/* Proceed button */}
+            {/* Proceed */}
             <div className={styles.proceedSection}>
               {selectedPlan && (
-                <div className={styles.selectedSummary}>
-                  Selected: <strong>{selectedPlan.tenure_months} months</strong> @ <strong>{formatINR(selectedPlan.monthly_amount)}/mo</strong>
-                  {(selectedPlan.interest_rate === 0 || selectedPlan.interest_rate === '0.00') && (
-                    <span className={styles.zeroTag}>0% interest</span>
-                  )}
+                <div className={styles.planSummary}>
+                  <div className={styles.planSummaryLeft}>
+                    <div className={styles.planSummaryAmt}>{formatINR(selectedPlan.monthly_amount)}<span>/mo</span></div>
+                    <div className={styles.planSummaryTenure}>× {selectedPlan.tenure_months} months</div>
+                  </div>
+                  <div className={styles.planSummaryRight}>
+                    {(parseFloat(selectedPlan.interest_rate) === 0) && (
+                      <span className={styles.planZeroTag}>0% Interest</span>
+                    )}
+                    {parseFloat(selectedPlan.cashback_amount) > 0 && (
+                      <span className={styles.planCashbackTag}>+{formatINR(selectedPlan.cashback_amount)} cashback</span>
+                    )}
+                  </div>
                 </div>
               )}
+
               <button
-                className={`${styles.proceedBtn} ${!selectedPlan ? styles.proceedBtnDisabled : ''} ${proceeded ? styles.proceedBtnSuccess : ''}`}
+                className={`${styles.proceedBtn} ${proceeded ? styles.proceedSuccess : ''}`}
                 onClick={handleProceed}
                 disabled={!selectedPlan}
               >
-                {proceeded ? '✓ Plan Selected! Proceeding...' : 'Proceed with Selected Plan'}
+                {proceeded ? (
+                  <span className={styles.proceedSuccessContent}>
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                      <circle cx="9" cy="9" r="9" fill="rgba(255,255,255,0.2)"/>
+                      <path d="M5.5 9l2.5 2.5 4-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Plan confirmed! Processing...
+                  </span>
+                ) : (
+                  'Proceed with Selected Plan →'
+                )}
               </button>
+
               <p className={styles.disclaimer}>
-                * EMI backed by mutual funds. No credit card required. Subject to eligibility.
+                * No credit card required · Backed by mutual funds · RBI regulated
               </p>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function LoadingSkeleton() {
-  return (
-    <div className="container" style={{ padding: '40px 24px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48 }}>
-        <div className="skeleton" style={{ aspectRatio: '1', borderRadius: 20 }} />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {[80, 200, 120, 150, 300].map((w, i) => (
-            <div key={i} className="skeleton" style={{ height: i === 1 ? 40 : i === 4 ? 120 : 20, width: `${w}px`, maxWidth: '100%' }} />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ErrorView({ error, onBack }) {
-  return (
-    <div className="container" style={{ padding: '80px 24px', textAlign: 'center' }}>
-      <div style={{ fontSize: 48, marginBottom: 16 }}>😕</div>
-      <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 28, marginBottom: 8 }}>Product not found</h2>
-      <p style={{ color: 'var(--text-secondary)', marginBottom: 24 }}>{error}</p>
-      <button
-        onClick={onBack}
-        style={{
-          background: 'var(--accent)', color: 'white',
-          border: 'none', padding: '12px 28px',
-          borderRadius: 99, fontSize: 14, fontWeight: 600,
-          cursor: 'pointer'
-        }}
-      >
-        Back to Products
-      </button>
     </div>
   );
 }
